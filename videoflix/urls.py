@@ -16,9 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
-from login.views import LoginView, RegisterView
+from login.views import LoginView, PasswordTokenCheckView, RegisterView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('login.urls')),
+    # code line below is for testing only
+    path('reset-password/<uidb64>/<token>/', PasswordTokenCheckView.as_view(), name='testing'),
 ]
