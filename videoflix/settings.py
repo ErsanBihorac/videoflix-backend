@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 import os
 from pathlib import Path
+import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -134,6 +135,7 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -144,12 +146,17 @@ REST_FRAMEWORK = {
 
 AUTH_USER_MODEL = 'login.CustomUser'
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+env = environ.Env()
+env_path = os.path.join(BASE_DIR, '.env')
+environ.Env.read_env(env_path)
+ENV_EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+ENV_EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'ersan.bihorac.2003@gmail.com'
-EMAIL_HOST_PASSWORD = 'vagn byxn pfle ykju'
-# EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
-# EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+EMAIL_HOST_USER = ENV_EMAIL_HOST_USER
+EMAIL_HOST_PASSWORD = ENV_EMAIL_HOST_PASSWORD
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False

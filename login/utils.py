@@ -1,13 +1,12 @@
 import os
 from django.template.loader import render_to_string
 from django.core.mail import EmailMultiAlternatives
-
+from django.conf import settings
 class Util:
     @staticmethod
     def send_registration_email(user, confirmation_link):
         subject = 'Confirm your email'
-        sender = 'ersan.bihorac.2003@gmail.com'
-        # sender = os.environ.get('EMAIL_HOST_USER')
+        sender = settings.ENV_EMAIL_HOST_USER
         receiver = [user.email]
 
         text_content = 'Thank you for registering with Videoflix. To complete your registration and verify your email address, click the link below: ' + confirmation_link

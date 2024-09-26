@@ -17,20 +17,15 @@ from django.conf import settings
 class RegisterView(APIView):
     def post(self, request, *args, **kwargs):
         serializer = RegisterSerializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
-            user=CustomUser.objects.get(email=user.email)
-
-            token=RefreshToken.for_user(user).access_token
-
-            current_site=get_current_site(request).domain
-            relativeLink=reverse('email-verify')
-            confirmation_link='http://'+current_site+relativeLink+'?token='+str(token)
-
-            Util.send_registration_email(user, confirmation_link)
-
-            return Response({'message': 'User registered succcessfully!'}, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=400)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        user=CustomUser.objects.get(email=user.email)
+        token=RefreshToken.for_user(user).access_token
+        current_site=get_current_site(request).domain
+        relativeLink=reverse('email-verify')
+        confirmation_link='http://'+current_site+relativeLink+'?token='+str(token)
+        Util.send_registration_email(user, confirmation_link)
+        return Response({'message': 'User registered succcessfully!'}, status=status.HTTP_201_CREATED)
     
 class LoginView(generics.GenericAPIView):
     def post(self, request, *args, **kwargs):
