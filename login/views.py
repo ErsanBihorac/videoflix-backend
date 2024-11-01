@@ -36,7 +36,14 @@ class LoginView(generics.GenericAPIView):
     def post(self, request, *args, **kwargs):
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+
+        response_data = {
+            'email': serializer.validated_data['email'],
+            'refresh': serializer.validated_data['refresh'],
+            'access': serializer.validated_data['access'],
+        }
+        
+        return Response(response_data, status=status.HTTP_200_OK)
 
 class VerifyEmailView(generics.GenericAPIView):
     def get(self, request):
@@ -56,7 +63,6 @@ class VerifyEmailView(generics.GenericAPIView):
 class RequestPasswordResetView(generics.GenericAPIView):
     def post(self, request):
         email=request.data['email']
-        
         if CustomUser.objects.filter(email=email).exists():
             user=CustomUser.objects.get(email=email)
             uidb64=urlsafe_base64_encode(smart_bytes(user.id))
@@ -66,8 +72,7 @@ class RequestPasswordResetView(generics.GenericAPIView):
             # confirmation_link='http://'+current_site+relativeLink !!! link below is created specific for angular test use
             relativeLink=reverse('testing', kwargs={'uidb64': uidb64, 'token': token})
             confirmation_link='http://localhost:4200'+relativeLink
-            Util.send_reset_password_email(user, confirmation_link)
-                
+            Util.send_reset_password_email(user, confirmation_link)       
         return Response({'success':'We have sent you a link to reset your password'}, status=status.HTTP_200_OK)
 
 class PasswordTokenCheckView(generics.GenericAPIView):
@@ -75,11 +80,9 @@ class PasswordTokenCheckView(generics.GenericAPIView):
         try:
             id=smart_str(urlsafe_base64_decode(uidb64))
             user=CustomUser.objects.get(id=id)
-
             if not PasswordResetTokenGenerator().check_token(user, token):
                 return Response({'error': 'Token is not valid, please request a new one'}, status=status.HTTP_401_UNAUTHORIZED)
             return Response({'success': True, 'message': 'Credentials Valid', 'uidb64': uidb64, 'token': token}, status=status.HTTP_200_OK)
-
         except DjangoUnicodeDecodeError as identifier:
             return Response({'error': 'Token is not valid, please request a new one'}, status=status.HTTP_401_UNAUTHORIZED)
         
@@ -94,6 +97,5 @@ class CheckRegisteredEmailView(generics.GenericAPIView):
         email = request.data.get('email')
         if email is None:
             return Response({'error': 'Email is required'}, status=status.HTTP_400_BAD_REQUEST)
-        
         is_registered = CustomUser.objects.filter(email=email).exists()
         return Response({'is_registered': is_registered})

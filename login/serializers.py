@@ -33,7 +33,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
-    password = serializers.CharField(write_only=True)  # write_only, um das Passwort nicht zurückzugeben
+    password = serializers.CharField(write_only=True)
     tokens = serializers.CharField(read_only=True)
 
     def validate(self, data):
@@ -47,9 +47,12 @@ class LoginSerializer(serializers.Serializer):
         if not user.is_verified:
             raise AuthenticationFailed('Email is not verified.')
 
+        tokens = user.tokens()
+
         return {
             'email': user.email,
-            'tokens': user.tokens(),
+            'refresh': tokens['refresh'],
+            'access': tokens['access'],
         }
     
 class RequestPasswordResetSerializer(serializers.Serializer):
@@ -71,15 +74,12 @@ class SetNewPasswordSerializer(serializers.Serializer):
             password=attrs.get('password')
             token=attrs.get('token')
             uidb64=attrs.get('uidb64')
-
             id=force_str(urlsafe_base64_decode(uidb64))
             user=CustomUser.objects.get(id=id)
             if not PasswordResetTokenGenerator().check_token(user, token):
                 raise AuthenticationFailed('The reset link is invalid', 401)
-
             user.set_password(password)
             user.save()
-            
         except Exception as e:
             raise AuthenticationFailed('The reset link is invalid', 401)
         return super().validate(attrs)

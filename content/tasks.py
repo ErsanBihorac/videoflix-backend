@@ -8,11 +8,11 @@ from moviepy.editor import VideoFileClip
 def convert_video_for_HLS_player(source, video_id, thumbnail_source):
     create_video_preview(source, video_id)
     comprimize_resize_thumbnail(thumbnail_source, video_id)
-    create_master_playlist(source)
+    prepare_create_master_playlist(source)
     convert_HLS_to_1080p(source)
     convert_HLS_to_720p(source)
     convert_HLS_to_480p(source)
-    move_video_files(source, video_id)
+    prepare_move_video_files(source, video_id)
 
 def create_video_preview(source, video_id):
     source = "/mnt/" + source.replace("\\", "/").replace("C:", "c")
@@ -43,14 +43,11 @@ def comprimize_resize_thumbnail(source, video_id):
 
     shutil.move(source, thumbnail_file_path)
 
-def move_video_files(source, video_id):
-    source = "/mnt/" + source.replace("\\", "/").replace("C:", "c")
-    base_name, _ = os.path.splitext(source)
-    directory_linux, _ = os.path.split(source)
-    target_directory = os.path.join('media', 'videos', str(video_id))
-
+def create_target_directory(target_directory):
     if not os.path.exists(target_directory):
         os.makedirs(target_directory)
+
+def get_files_to_move(directory_linux, base_name):
     files_to_move = [
         f"{directory_linux}/master.m3u8",
         f"{base_name}.mp4",
@@ -59,6 +56,18 @@ def move_video_files(source, video_id):
         f"{base_name}_480p.m3u8"
     ]
 
+    return files_to_move
+
+def prepare_move_video_files(source, video_id):
+    source = "/mnt/" + source.replace("\\", "/").replace("C:", "c")
+    base_name, _ = os.path.splitext(source)
+    directory_linux, _ = os.path.split(source)
+    target_directory = os.path.join('media', 'videos', str(video_id))
+    create_target_directory(target_directory)
+    files_to_move = get_files_to_move(directory_linux, base_name)
+    move_video_files(base_name, target_directory, files_to_move)
+
+def move_video_files(base_name, target_directory,files_to_move):
     for quality in ['1080p', '720p', '480p']:
         segment_pattern = f"{base_name}_{quality}_*.ts"
         segment_files = glob.glob(segment_pattern)
@@ -71,13 +80,7 @@ def move_video_files(source, video_id):
         else:
             print(f"Datei nicht gefunden: {file_path}")
 
-def create_master_playlist(source):
-    file_name, _ = os.path.splitext(source)
-    file_name_no_url = source.split('\\')[-1].split('.')[0]
-
-    master_playlist_path = source.rsplit("\\", 1)[0] + "\\" + 'master.m3u8'
-    master_playlist_path_linux = "/mnt/" + master_playlist_path.replace("\\", "/").replace("C:", "c")    
-
+def create_master_playlist(master_playlist_path_linux, file_name_no_url):
     with open(master_playlist_path_linux, 'w') as f:
         f.write("#EXTM3U\n")
         f.write("#EXT-X-VERSION:3\n")
@@ -87,6 +90,14 @@ def create_master_playlist(source):
         f.write(f"{file_name_no_url}_720p.m3u8\n")
         f.write("#EXT-X-STREAM-INF:BANDWIDTH=1000000,RESOLUTION=854x480\n")
         f.write(f"{file_name_no_url}_480p.m3u8\n")
+
+def prepare_create_master_playlist(source):
+    file_name, _ = os.path.splitext(source)
+    file_name_no_url = source.split('\\')[-1].split('.')[0]
+
+    master_playlist_path = source.rsplit("\\", 1)[0] + "\\" + 'master.m3u8'
+    master_playlist_path_linux = "/mnt/" + master_playlist_path.replace("\\", "/").replace("C:", "c")    
+    create_master_playlist(master_playlist_path_linux, file_name_no_url)
 
 def convert_HLS_to_1080p(source):
     file_name, _ = os.path.splitext(source)

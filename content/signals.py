@@ -1,4 +1,3 @@
-import os
 from content.tasks import convert_video_for_HLS_player, delete_video_files
 from .models import Video
 from django.dispatch import receiver

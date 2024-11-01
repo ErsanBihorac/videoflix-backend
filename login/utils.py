@@ -14,7 +14,6 @@ class Util:
 
         msg = EmailMultiAlternatives(subject, text_content, sender, receiver)
         msg.attach_alternative(html_content, "text/html")
-
         msg.send()
 
     def send_reset_password_email(user, confirmation_link):
