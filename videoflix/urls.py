@@ -16,7 +16,6 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
-from login.views import LoginView, PasswordTokenCheckView, RegisterView
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -26,6 +25,4 @@ urlpatterns = [
     path('api/content/', include('content.urls')),
     path('__debug__/', include('debug_toolbar.urls')),
     path('django-rq/', include('django_rq.urls')),
-    # code line below is for testing only
-    path('reset-password/<uidb64>/<token>/', PasswordTokenCheckView.as_view(), name='testing'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

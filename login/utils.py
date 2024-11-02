@@ -5,6 +5,9 @@ from django.conf import settings
 class Util:
     @staticmethod
     def send_registration_email(user, confirmation_link):
+        """
+        Sends a verification email
+        """
         subject = 'Confirm your email'
         sender = settings.ENV_EMAIL_HOST_USER
         receiver = [user.email]
@@ -17,6 +20,9 @@ class Util:
         msg.send()
 
     def send_reset_password_email(user, confirmation_link):
+        """
+        Sends a password reset email
+        """
         subject = 'Reset your Password'
         sender = settings.ENV_EMAIL_HOST_USER
         receiver = [user.email]

@@ -21,6 +21,9 @@ from django.urls import reverse
 from .utils import Util
 class RegisterView(APIView):
     def post(self, request, *args, **kwargs):
+        """
+        Registers a user and sents a verification email
+        """
         serializer = RegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
@@ -34,6 +37,9 @@ class RegisterView(APIView):
     
 class LoginView(generics.GenericAPIView):
     def post(self, request, *args, **kwargs):
+        """
+        Logs the user in
+        """
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -47,6 +53,9 @@ class LoginView(generics.GenericAPIView):
 
 class VerifyEmailView(generics.GenericAPIView):
     def get(self, request):
+        """
+        Verifies the user
+        """
         token=request.GET.get('token')
         try:
             payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
@@ -62,6 +71,9 @@ class VerifyEmailView(generics.GenericAPIView):
         
 class RequestPasswordResetView(generics.GenericAPIView):
     def post(self, request):
+        """
+        Sends email with which the user can reset their password
+        """
         email=request.data['email']
         if CustomUser.objects.filter(email=email).exists():
             user=CustomUser.objects.get(email=email)
@@ -77,6 +89,9 @@ class RequestPasswordResetView(generics.GenericAPIView):
 
 class PasswordTokenCheckView(generics.GenericAPIView):
     def get(self, request, uidb64, token):
+        """
+        Checks if the password token is valid
+        """
         try:
             id=smart_str(urlsafe_base64_decode(uidb64))
             user=CustomUser.objects.get(id=id)
@@ -88,12 +103,18 @@ class PasswordTokenCheckView(generics.GenericAPIView):
         
 class SetNewPasswordView(generics.GenericAPIView):
     def patch(self, request):
+        """
+        Replaces the old password
+        """
         serializer = SetNewPasswordSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         return Response({'success': True, 'message': 'Password reset success'}, status=status.HTTP_200_OK)
 
 class CheckRegisteredEmailView(generics.GenericAPIView):
     def post(self, request):
+        """
+        Checks if the email was already registered in the database
+        """
         email = request.data.get('email')
         if email is None:
             return Response({'error': 'Email is required'}, status=status.HTTP_400_BAD_REQUEST)

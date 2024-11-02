@@ -5,6 +5,9 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
+        """
+        Creates a new user
+        """
         if not email:
             raise ValueError('The email address must be provided.')
         email = self.normalize_email(email)
@@ -14,6 +17,9 @@ class CustomUserManager(BaseUserManager):
         return user
     
     def create_superuser(self, email, password=None, **extra_fields):
+        """
+        creates a new superuser
+        """
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
 
@@ -36,6 +42,9 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         return self.email
     
     def tokens(self):
+        """
+        Returns refresh and access tokens
+        """
         refresh = RefreshToken.for_user(self)
         return {
             'refresh': str(refresh),

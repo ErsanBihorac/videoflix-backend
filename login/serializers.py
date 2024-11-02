@@ -5,8 +5,8 @@ from django.contrib.auth import authenticate
 from rest_framework.exceptions import AuthenticationFailed
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.utils.encoding import smart_str, force_str, smart_bytes, DjangoUnicodeDecodeError
-from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.utils.encoding import  force_str
+from django.utils.http import urlsafe_base64_decode
 
 CustomUser = get_user_model()
 
@@ -20,11 +20,17 @@ class RegisterSerializer(serializers.ModelSerializer):
         }
 
     def validate_email(self, value):
+        """
+        Validates the email
+        """
         if CustomUser.objects.filter(email=value).exists():
             raise ValidationError('User with this email already exists.')
         return value
 
     def create(self, validated_data):
+        """
+        Creates a new user
+        """
         user = CustomUser.objects.create_user(
             email=validated_data['email'],
             password=validated_data['password']
@@ -37,6 +43,9 @@ class LoginSerializer(serializers.Serializer):
     tokens = serializers.CharField(read_only=True)
 
     def validate(self, data):
+        """
+        Validates the login data
+        """
         email = data.get('email')
         password = data.get('password')
         user = authenticate(email=email, password=password)
@@ -70,6 +79,9 @@ class SetNewPasswordSerializer(serializers.Serializer):
         fields=['password', 'token', 'uidb64']
 
     def validate(self, attrs):
+        """
+        Validates the data
+        """
         try:
             password=attrs.get('password')
             token=attrs.get('token')
