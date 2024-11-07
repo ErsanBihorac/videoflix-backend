@@ -20,10 +20,13 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
+from login.views import PasswordTokenCheckView
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('login.urls')),
     path('api/content/', include('content.urls')),
     path('__debug__/', include('debug_toolbar.urls')),
     path('django-rq/', include('django_rq.urls')),
+    path('password-reset/<uidb64>/<token>/', PasswordTokenCheckView.as_view(), name='password-reset-confirm'),
 ] + staticfiles_urlpatterns()
