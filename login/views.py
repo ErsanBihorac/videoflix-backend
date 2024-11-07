@@ -80,10 +80,8 @@ class RequestPasswordResetView(generics.GenericAPIView):
             uidb64=urlsafe_base64_encode(smart_bytes(user.id))
             token=PasswordResetTokenGenerator().make_token(user)
             current_site=get_current_site(request=request).domain
-            # relativeLink=reverse('password-reset-confirm', kwargs={'uidb64': uidb64, 'token': token}) !!! link below is created specific for angular test use
-            # confirmation_link='http://'+current_site+relativeLink !!! link below is created specific for angular test use
-            relativeLink=reverse('testing', kwargs={'uidb64': uidb64, 'token': token})
-            confirmation_link='http://localhost:4200'+relativeLink
+            relativeLink=reverse('password-reset-confirm', kwargs={'uidb64': uidb64, 'token': token})
+            confirmation_link='http://'+current_site+relativeLink 
             Util.send_reset_password_email(user, confirmation_link)       
         return Response({'success':'We have sent you a link to reset your password'}, status=status.HTTP_200_OK)
 
