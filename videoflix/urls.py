@@ -29,4 +29,4 @@ urlpatterns = [
     path('__debug__/', include('debug_toolbar.urls')),
     path('django-rq/', include('django_rq.urls')),
     path('password-reset/<uidb64>/<token>/', PasswordTokenCheckView.as_view(), name='password-reset-confirm'),
-] + staticfiles_urlpatterns()
+] + staticfiles_urlpatterns() + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
