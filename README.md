@@ -59,8 +59,7 @@ Step-by-step instructions for setting up the project locally.
 
 4. **Configure the database**
 
-    ```bash
-    Ensure PostgreSQL is running, and set the databse credentials in videoflix-backend/videoflix/settings.py
+    Ensure PostgreSQL is running, and set the databse credentials in videoflix-backend/videoflix settings.py
 
 5. **Run database migrations**
 
