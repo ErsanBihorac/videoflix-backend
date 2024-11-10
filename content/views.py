@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework import generics
 from content.models import Video, VideoProgress
-from content.serializers import VideoProgressSerializer, VideoSerializer
+from content.serializers import VideoProgressSerializer, VideoProgressUpdateSerializer, VideoSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
@@ -17,6 +17,9 @@ class VideoProgressViewSet(viewsets.ViewSet):
     
     @action(detail=False, methods=['get'])
     def in_progress(self, request):
+        """
+        Returns list with all videos that have progress of watching
+        """
         user = request.user
         in_progress_videos = VideoProgress.objects.filter(user=user, started=True ,completed=False).select_related('video')
 
@@ -25,25 +28,21 @@ class VideoProgressViewSet(viewsets.ViewSet):
     
     @action(detail=True, methods=['post'])
     def save_progress(self, request, pk=None):
+        """
+        Saves the progress of the target video
+        """
         user = request.user
-        last_position = request.data.get('last_position')
+        serializer = VideoProgressUpdateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        video = self._get_video_or_404(pk)
+        serializer.save_progress(user=user, video=video)
+        return Response({'status': 'Progress saved successfully.'}, status=status.HTTP_200_OK)
 
-        if last_position is None:
-            return Response({'error': 'Last position is required.'}, status=status.HTTP_400_BAD_REQUEST)
-        
+    def _get_video_or_404(self, pk):
+        """
+        Retrieves the Video object or raises a NotFound exception
+        """
         try:
-            video = Video.objects.get(pk=pk)
+            return Video.objects.get(pk=pk)
         except Video.DoesNotExist:
             raise NotFound(detail='Video not found.')
-        
-        video_progress, created = VideoProgress.objects.get_or_create(
-            user=user,
-            video=video,
-            defaults={'last_position': last_position, 'started': True}
-        )
-
-        if not created:
-            video_progress.last_position = last_position
-            video_progress.save()
-
-        return Response({'status': 'Progress saved successfully.'}, status=status.HTTP_200_OK)
