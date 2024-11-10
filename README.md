@@ -42,34 +42,40 @@ Step-by-step instructions for setting up the project locally.
 
 1. **Clone the repository**
 
-   ```bash
-   git clone https://github.com/ErsanBihorac/videoflix-backend.git
-   cd videoflix-backend
+    ```bash
+    git clone https://github.com/ErsanBihorac/videoflix-backend.git
+    cd videoflix-backend
 
 2. **Create a virtual environment**
 
+    ```bash
     python3 -m venv env
     source env/bin/activate
 
 3. **Install dependencies**
 
+    ```bash
     pip install -r requirements.txt
 
 4. **Configure the database**
 
+    ```bash
     Ensure PostgreSQL is running, and set the databse credentials in videoflix-backend/videoflix/settings.py
 
 5. **Run database migrations**
 
+    ```bash
     python manage.py migrate
 
 6. **Create a superuser (optional)**
 
+    ```bash
     python manage.py createsuperuser
     follow the instructions of the console
 
 7. **Start the server**
 
+    ```bash
     python manage.py runserver
 
 ## Usage
