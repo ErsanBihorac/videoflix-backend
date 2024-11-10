@@ -168,7 +168,7 @@ def convert_HLS_to_480p(source):
     target_linux = "/mnt/" + target.replace("\\", "/").replace("C:", "c")
     segment_filename_linux = "/mnt/" + segment_filename.replace("\\", "/").replace("C:", "c")
 
-    cmd = 'ffmpeg -i "{}" \-vf scale=-2:480 -c:v h264 -b:v 1000k -c:a aac -b:a 128k -hls_time 6 -hls_playlist_type vod -hls_segment_filename "{}" "{}"'.format(source_linux,segment_filename_linux, target_linux)
+    cmd = 'ffmpeg -i "{}" -vf scale=-2:480 -c:v h264 -b:v 1000k -c:a aac -b:a 128k -hls_time 6 -hls_playlist_type vod -hls_segment_filename "{}" "{}"'.format(source_linux,segment_filename_linux, target_linux)
     subprocess.run(cmd, capture_output=True, shell=True)
 
 def delete_video_files(video_id):

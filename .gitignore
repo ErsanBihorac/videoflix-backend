@@ -3,4 +3,5 @@ env/
 env_lin/
 media/
 static/
+htmlcov/
 db.sqlite3
