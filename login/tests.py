@@ -10,7 +10,7 @@ class TestModels(TestCase):
     def test_model_custom_user(self):
         self.assertTrue(isinstance(self.user, CustomUser))
         self.assertEqual(self.user.email, 'test@mail.com')
-        self.assertEqual(self.user.password, 'testing_password')
+        self.assertTrue(self.user.check_password('testing_password'))
         self.assertEqual(self.user.is_verified, False)
         self.assertEqual(self.user.is_active, True)
         self.assertEqual(self.user.is_staff, False)

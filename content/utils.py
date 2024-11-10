@@ -36,17 +36,13 @@ def create_video():
     return video
 
 def create_custom_user():
-    user = CustomUser.objects.create(
-        email='test@mail.com',
-        password='testing_password'
-    )
+    user = CustomUser.objects.create(email='test@mail.com')
+    user.set_password('testing_password')
+    user.save()
 
     return user
 
-def create_video_progress():
-    video = create_video()
-    user = create_custom_user()
-
+def create_video_progress(user, video):
     video_progress = VideoProgress.objects.create(
         user=user,
         video=video,
