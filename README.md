@@ -75,10 +75,10 @@ Step-by-step instructions for setting up the project locally.
 7. **paste credentials with your own values(important) and save the file**
 
     ```bash
-EMAIL_HOST_USER=(your email address to send emails)
-EMAIL_HOST_PASSWORD=(the password to let third parties use your email)
-POSTGRESQL_PASSWORD=(your postgresql server password)
-POSTGRESQL_HOST=("localhost")
+    EMAIL_HOST_USER=(your email address to send emails)
+    EMAIL_HOST_PASSWORD=(the password to let third parties use your email)
+    POSTGRESQL_PASSWORD=(your postgresql server password)
+    POSTGRESQL_HOST=("localhost")
 
 
 8. **Create a superuser (optional)**
