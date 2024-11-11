@@ -121,6 +121,10 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 WSGI_APPLICATION = 'videoflix.wsgi.application'
 
+# BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+env = environ.Env()
+env_path = os.path.join(BASE_DIR, '.env')
+environ.Env.read_env(env_path)
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
@@ -133,13 +137,15 @@ DATABASES = {
 }
 
 # DATABASE for PostgreSQL 
+# POSTGRESQL_PASSWORD = env('EMAIL_HOST_USER')
+# POSTGRESQL_HOST = env('EMAIL_HOST_PASSWORD')
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql',
 #         'NAME': 'videoflix',
 #         'USER': 'ersan',
-#         'PASSWORD': 'fratz123',
-#         'HOST': 'localhost',
+#         'PASSWORD': POSTGRESQL_PASSWORD,
+#         'HOST': POSTGRESQL_HOST,
 #         'PORT': '',
 #     }
 # }
@@ -196,10 +202,6 @@ REST_FRAMEWORK = {
 
 AUTH_USER_MODEL = 'login.CustomUser'
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-env = environ.Env()
-env_path = os.path.join(BASE_DIR, '.env')
-environ.Env.read_env(env_path)
 ENV_EMAIL_HOST_USER = env('EMAIL_HOST_USER')
 ENV_EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 
