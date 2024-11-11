@@ -66,13 +66,28 @@ Step-by-step instructions for setting up the project locally.
     ```bash
     python manage.py migrate
 
-6. **Create a superuser (optional)**
+6. **Create .env with credentials**
+
+    ```bash
+    touch .env
+    nano .env
+    
+7. **paste credentials with your own values(important) and save the file**
+
+    ```bash
+EMAIL_HOST_USER=(your email address to send emails)
+EMAIL_HOST_PASSWORD=(the password to let third parties use your email)
+POSTGRESQL_PASSWORD=(your postgresql server password)
+POSTGRESQL_HOST=("localhost")
+
+
+8. **Create a superuser (optional)**
 
     ```bash
     python manage.py createsuperuser
     follow the instructions of the console
 
-7. **Start the server**
+9. **Start the server**
 
     ```bash
     python manage.py runserver
@@ -136,7 +151,7 @@ Execute all tests:
 
     python manage.py test
 
-1. **Check test coverage**
+2. **Check test coverage**
 
 get test coverage of the whole application:
 
