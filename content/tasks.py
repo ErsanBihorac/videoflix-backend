@@ -9,6 +9,7 @@ def convert_video_for_HLS_player(source, video_id, thumbnail_source):
     """
     Creates a video with the preview, thumbnail, master playlist, all resolutions and puts them in the right order
     """
+    print('Converting...')
     create_video_preview(source, video_id)
     comprimize_resize_thumbnail(thumbnail_source, video_id)
     prepare_create_master_playlist(source)
@@ -21,6 +22,7 @@ def create_video_preview(source, video_id):
     """
     Creates video preview
     """
+    print('Creating preview...')
     source = "/mnt/" + source.replace("\\", "/").replace("C:", "c")
     target_directory = os.path.join('media', 'previews', str(video_id))
 
@@ -33,9 +35,11 @@ def create_video_preview(source, video_id):
         preview = video.subclip(0, 3)
         preview.write_videofile(preview_file_path, codec='libx264', audio_codec='aac', fps=24)
 
+    print('Creating finished...')
+
 def comprimize_resize_thumbnail(source, video_id):
     """
-    Comprimizes the thumbnail file size and sets it to the correct resolution
+    Comprimizes the thumbnail file size and sets it to the correct resolution.
     """
     source = "/mnt/" + source.replace("\\", "/").replace("C:", "c")
     target_directory = os.path.join('media', 'thumbnails', str(video_id))
@@ -43,14 +47,15 @@ def comprimize_resize_thumbnail(source, video_id):
     if not os.path.exists(target_directory):
         os.makedirs(target_directory)
 
-    thumbnail_file_path = os.path.join(target_directory, f'thumbnail.jpeg')
+    # Definiere den Dateipfad als Ziel für die komprimierte Datei
+    thumbnail_file_path = os.path.join(target_directory, f'thumbnail_{video_id}.jpeg')
 
     with Image.open(source) as img:
         img = img.convert('RGB')
-        img.resize((120, 214))
-        img.save(source, format='JPEG', quality=85, optimize=True) 
+        img = img.resize((120, 214))
+        img.save(thumbnail_file_path, format='JPEG', quality=85, optimize=True)
 
-    shutil.move(source, thumbnail_file_path)
+    print('Thumbnail erfolgreich komprimiert und gespeichert.')
 
 def create_target_directory(target_directory):
     """
@@ -75,14 +80,16 @@ def get_files_to_move(directory_linux, base_name):
 
 def prepare_move_video_files(source, video_id):
     """
-    Prepares all the data that is needed to move the video files in the specific directory
+    Prepares all the data needed to move the video files to the correct directory.
     """
     source = "/mnt/" + source.replace("\\", "/").replace("C:", "c")
     base_name, _ = os.path.splitext(source)
-    directory_linux, _ = os.path.split(source)
     target_directory = os.path.join('media', 'videos', str(video_id))
+
+    # Erstelle das Zielverzeichnis, falls es nicht existiert
     create_target_directory(target_directory)
-    files_to_move = get_files_to_move(directory_linux, base_name)
+
+    files_to_move = get_files_to_move(base_name)
     move_video_files(base_name, target_directory, files_to_move)
 
 def move_video_files(base_name, target_directory, files_to_move):
@@ -105,6 +112,7 @@ def create_master_playlist(master_playlist_path_linux, file_name_no_url):
     """
     Creates the master playlist
     """
+    print('create master playlist to this point')
     with open(master_playlist_path_linux, 'w') as f:
         f.write("#EXTM3U\n")
         f.write("#EXT-X-VERSION:3\n")
@@ -121,9 +129,9 @@ def prepare_create_master_playlist(source):
     """
     file_name, _ = os.path.splitext(source)
     file_name_no_url = source.split('\\')[-1].split('.')[0]
-
     master_playlist_path = source.rsplit("\\", 1)[0] + "\\" + 'master.m3u8'
-    master_playlist_path_linux = "/mnt/" + master_playlist_path.replace("\\", "/").replace("C:", "c")    
+    master_playlist_path_linux = "/mnt/" + master_playlist_path.replace("\\", "/").replace("C:", "c") 
+    print(master_playlist_path_linux, file_name_no_url)   
     create_master_playlist(master_playlist_path_linux, file_name_no_url)
 
 def convert_HLS_to_1080p(source):
