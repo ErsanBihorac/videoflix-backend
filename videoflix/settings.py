@@ -12,21 +12,21 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 import os
 from pathlib import Path
-import environ
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-_bzedh4+*3gujwuooi80kdl4-hd0h&pw!ln(f+^dp(7gh5#5wo'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
 
 # Application definition
 
@@ -78,11 +78,7 @@ INTERNAL_IPS = [
     '127.0.0.1',
 ]
 
-ALLOWED_HOSTS = [
-    'localhost',
-    'ersan-bihorac.developerakademie.org',
-    'ersanbihorac.de',
-]
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(',')
 
 CORS_ALLOWED_ORIGINS = ['http://localhost:4200']
 CSRF_TRUSTED_ORIGINS = ['http://localhost:4200']
@@ -92,7 +88,7 @@ CACHES = {
         "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": "redis://127.0.0.1:6379/1",
         "OPTIONS": {
-            "PASSWORD": "foobared",
+            "PASSWORD": os.getenv('REDIS_PASSWORD'),
             "CLIENT_CLASS": "django_redis.client.DefaultClient"
         },
         "KEY_PREFIX": "videoflix"
@@ -122,12 +118,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 WSGI_APPLICATION = 'videoflix.wsgi.application'
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-env = environ.Env()
-env_path = os.path.join(BASE_DIR, '.env')
-environ.Env.read_env(env_path)
-
-
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
@@ -138,17 +128,13 @@ environ.Env.read_env(env_path)
 #    }
 # }
 
-# DATABASE for PostgreSQL 
-POSTGRESQL_PASSWORD = env('POSTGRESQL_PASSWORD')
-POSTGRESQL_HOST = env('POSTGRESQL_HOST')
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'videoflix',
         'USER': 'ersan',
-        'PASSWORD': POSTGRESQL_PASSWORD,
-        'HOST': POSTGRESQL_HOST,
+        'PASSWORD': os.getenv('POSTGRESQL_PASSWORD'),
+        'HOST': os.getenv('POSTGRESQL_HOST'),
         'PORT': '',
     }
 }
@@ -205,13 +191,10 @@ REST_FRAMEWORK = {
 
 AUTH_USER_MODEL = 'login.CustomUser'
 
-ENV_EMAIL_HOST_USER = env('EMAIL_HOST_USER')
-ENV_EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
-
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = ENV_EMAIL_HOST_USER
-EMAIL_HOST_PASSWORD = ENV_EMAIL_HOST_PASSWORD
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
