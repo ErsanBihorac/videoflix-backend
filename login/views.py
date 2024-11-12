@@ -75,7 +75,8 @@ class RequestPasswordResetView(generics.GenericAPIView):
             user=CustomUser.objects.get(email=email)
             uidb64=urlsafe_base64_encode(smart_bytes(user.id))
             token=PasswordResetTokenGenerator().make_token(user)
-            current_site=get_current_site(request=request).domain
+            # current_site=get_current_site(request=request).domain
+            current_site="https://ersanbihorac.de/Videoflix"
             relativeLink=reverse('password-reset-confirm', kwargs={'uidb64': uidb64, 'token': token})
             # production comfirmation link
             confirmation_link='http://'+current_site+relativeLink 
