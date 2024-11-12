@@ -1,3 +1,4 @@
+import os
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from login.serializers import RegisterSerializer, LoginSerializer, SetNewPasswordSerializer
@@ -15,6 +16,9 @@ from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from .utils import Util
+from dotenv import load_dotenv
+load_dotenv()
+
 class RegisterView(APIView):
     def post(self, request, *args, **kwargs):
         """
@@ -75,8 +79,7 @@ class RequestPasswordResetView(generics.GenericAPIView):
             user=CustomUser.objects.get(email=email)
             uidb64=urlsafe_base64_encode(smart_bytes(user.id))
             token=PasswordResetTokenGenerator().make_token(user)
-            # current_site=get_current_site(request=request).domain
-            current_site="ersanbihorac.de/Videoflix"
+            current_site=os.getenv('EMAIL_HOST_USER')
             relativeLink=reverse('password-reset-confirm', kwargs={'uidb64': uidb64, 'token': token})
             # production comfirmation link
             confirmation_link='https://'+current_site+relativeLink 

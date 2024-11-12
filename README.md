@@ -80,6 +80,8 @@ Step-by-step instructions for setting up the project locally.
 
     REDIS_PASSWORD=your redis password
 
+    FRONTEND_DOMAIN_HOST=domain of the frontend
+
 6. **run postgresql**
 
     ```bash
