@@ -79,7 +79,7 @@ class RequestPasswordResetView(generics.GenericAPIView):
             user=CustomUser.objects.get(email=email)
             uidb64=urlsafe_base64_encode(smart_bytes(user.id))
             token=PasswordResetTokenGenerator().make_token(user)
-            current_site=os.getenv('EMAIL_HOST_USER')
+            current_site=os.getenv('FRONTEND_DOMAIN_HOST')
             relativeLink=reverse('password-reset-confirm', kwargs={'uidb64': uidb64, 'token': token})
             # production comfirmation link
             confirmation_link='https://'+current_site+relativeLink 
