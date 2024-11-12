@@ -81,6 +81,7 @@ INTERNAL_IPS = [
 ALLOWED_HOSTS = [
     'localhost',
     'ersan-bihorac.developerakademie.org',
+    'ersanbihorac.de',
 ]
 
 CORS_ALLOWED_ORIGINS = ['http://localhost:4200']
@@ -122,33 +123,39 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 WSGI_APPLICATION = 'videoflix.wsgi.application'
 
 # BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# env = environ.Env()
+# env_path = os.path.join(BASE_DIR, '.env')
+# environ.Env.read_env(env_path)
+
+# Initialisiere django-environ
 env = environ.Env()
-env_path = os.path.join(BASE_DIR, '.env')
-environ.Env.read_env(env_path)
+# Lade die .env-Datei
+environ.Env.read_env()
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
-   'default': {
-       'ENGINE': 'django.db.backends.sqlite3',
-       'NAME': BASE_DIR / 'db.sqlite3',
-   }
-}
+# DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.sqlite3',
+#        'NAME': BASE_DIR / 'db.sqlite3',
+#    }
+# }
 
 # DATABASE for PostgreSQL 
-# POSTGRESQL_PASSWORD = env('EMAIL_HOST_USER')
-# POSTGRESQL_HOST = env('EMAIL_HOST_PASSWORD')
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'videoflix',
-#         'USER': 'ersan',
-#         'PASSWORD': POSTGRESQL_PASSWORD,
-#         'HOST': POSTGRESQL_HOST,
-#         'PORT': '',
-#     }
-# }
+POSTGRESQL_PASSWORD = env('POSTGRESQL_PASSWORD')
+POSTGRESQL_HOST = env('POSTGRESQL_HOST')
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'videoflix',
+        'USER': 'ersan',
+        'PASSWORD': POSTGRESQL_PASSWORD,
+        'HOST': POSTGRESQL_HOST,
+        'PORT': '',
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
