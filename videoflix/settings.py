@@ -122,16 +122,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 WSGI_APPLICATION = 'videoflix.wsgi.application'
 
-# BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-# env = environ.Env()
-# env_path = os.path.join(BASE_DIR, '.env')
-# environ.Env.read_env(env_path)
-
-# Initialisiere django-environ
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 env = environ.Env()
-# Lade die .env-Datei
-environ.Env.read_env()
+env_path = os.path.join(BASE_DIR, '.env')
+environ.Env.read_env(env_path)
+
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
@@ -146,6 +141,7 @@ environ.Env.read_env()
 # DATABASE for PostgreSQL 
 POSTGRESQL_PASSWORD = env('POSTGRESQL_PASSWORD')
 POSTGRESQL_HOST = env('POSTGRESQL_HOST')
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
