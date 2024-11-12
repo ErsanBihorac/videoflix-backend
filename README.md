@@ -80,9 +80,10 @@ Step-by-step instructions for setting up the project locally.
 
     REDIS_PASSWORD=your redis password
 
-6. **Configure the database**
+6. **run postgresql**
 
-    Ensure PostgreSQL is running, and set the databse credentials in videoflix-backend/videoflix settings.py
+    ```bash
+    service postgresql start
 
 7. **Run database migrations**
 
@@ -96,10 +97,15 @@ Step-by-step instructions for setting up the project locally.
     python manage.py createsuperuser
     follow the instructions of the console
 
-9. **Start the server**
+9. **Start the nginx**
 
     ```bash
-    python manage.py runserver
+    service start nginx
+
+9. **Start gunicorn**
+
+    ```bash
+    gunicorn videoflix.wsgi:application
 
 ## Usage
 
