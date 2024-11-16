@@ -9,7 +9,6 @@ def convert_video_for_HLS_player(source, video_id, thumbnail_source):
     """
     Creates a video with the preview, thumbnail, master playlist, all resolutions and puts them in the right order
     """
-    print('Converting...')
     create_video_preview(source, video_id)
     comprimize_resize_thumbnail(thumbnail_source, video_id)
     prepare_create_master_playlist(source)
@@ -22,40 +21,28 @@ def create_video_preview(source, video_id):
     """
     Creates video preview
     """
-    print('Creating preview...')
-    source = "/mnt/" + source.replace("\\", "/").replace("C:", "c")
     target_directory = os.path.join('media', 'previews', str(video_id))
-
-    if not os.path.exists(target_directory):
-        os.makedirs(target_directory)
-
+    create_target_directory(target_directory)
     preview_file_path = os.path.join(target_directory, f'preview.mp4')
 
     with VideoFileClip(source) as video:
         preview = video.subclip(0, 3)
         preview.write_videofile(preview_file_path, codec='libx264', audio_codec='aac', fps=24)
 
-    print('Creating finished...')
-
 def comprimize_resize_thumbnail(source, video_id):
     """
     Comprimizes the thumbnail file size and sets it to the correct resolution.
     """
-    source = "/mnt/" + source.replace("\\", "/").replace("C:", "c")
     target_directory = os.path.join('media', 'thumbnails', str(video_id))
-
-    if not os.path.exists(target_directory):
-        os.makedirs(target_directory)
-
-    # Definiere den Dateipfad als Ziel für die komprimierte Datei
-    thumbnail_file_path = os.path.join(target_directory, f'thumbnail_{video_id}.jpeg')
+    create_target_directory(target_directory)
+    thumbnail_file_path = os.path.join(target_directory, f'thumbnail.jpeg')
 
     with Image.open(source) as img:
         img = img.convert('RGB')
-        img = img.resize((120, 214))
-        img.save(thumbnail_file_path, format='JPEG', quality=85, optimize=True)
+        img.resize((120, 214))
+        img.save(source, format='JPEG', quality=85, optimize=True) 
 
-    print('Thumbnail erfolgreich komprimiert und gespeichert.')
+    shutil.move(source, thumbnail_file_path)
 
 def create_target_directory(target_directory):
     """
@@ -64,12 +51,12 @@ def create_target_directory(target_directory):
     if not os.path.exists(target_directory):
         os.makedirs(target_directory)
 
-def get_files_to_move(directory_linux, base_name):
+def get_files_to_move(directory, base_name):
     """
     Returns a list with all the files that will be moved
     """
     files_to_move = [
-        f"{directory_linux}/master.m3u8",
+        f"{directory}/master.m3u8",
         f"{base_name}.mp4",
         f"{base_name}_1080p.m3u8",
         f"{base_name}_720p.m3u8",
@@ -82,14 +69,12 @@ def prepare_move_video_files(source, video_id):
     """
     Prepares all the data needed to move the video files to the correct directory.
     """
-    source = "/mnt/" + source.replace("\\", "/").replace("C:", "c")
     base_name, _ = os.path.splitext(source)
+    directory, _ = os.path.split(source)
     target_directory = os.path.join('media', 'videos', str(video_id))
 
-    # Erstelle das Zielverzeichnis, falls es nicht existiert
     create_target_directory(target_directory)
-
-    files_to_move = get_files_to_move(base_name)
+    files_to_move = get_files_to_move(directory, base_name)
     move_video_files(base_name, target_directory, files_to_move)
 
 def move_video_files(base_name, target_directory, files_to_move):
@@ -108,12 +93,11 @@ def move_video_files(base_name, target_directory, files_to_move):
         else:
             print(f"Datei nicht gefunden: {file_path}")
 
-def create_master_playlist(master_playlist_path_linux, file_name_no_url):
+def create_master_playlist(master_playlist_path, file_name_no_url):
     """
     Creates the master playlist
     """
-    print('create master playlist to this point')
-    with open(master_playlist_path_linux, 'w') as f:
+    with open(master_playlist_path, 'w') as f:
         f.write("#EXTM3U\n")
         f.write("#EXT-X-VERSION:3\n")
         f.write("#EXT-X-STREAM-INF:BANDWIDTH=5000000,RESOLUTION=1920x1080\n")
@@ -127,12 +111,10 @@ def prepare_create_master_playlist(source):
     """
     Prepares the data to create the master playlist
     """
-    file_name, _ = os.path.splitext(source)
     file_name_no_url = source.split('\\')[-1].split('.')[0]
     master_playlist_path = source.rsplit("\\", 1)[0] + "\\" + 'master.m3u8'
-    master_playlist_path_linux = "/mnt/" + master_playlist_path.replace("\\", "/").replace("C:", "c") 
-    print(master_playlist_path_linux, file_name_no_url)   
-    create_master_playlist(master_playlist_path_linux, file_name_no_url)
+
+    create_master_playlist(master_playlist_path, file_name_no_url)
 
 def convert_HLS_to_1080p(source):
     """
@@ -142,11 +124,7 @@ def convert_HLS_to_1080p(source):
     target = file_name + '_1080p.m3u8'
     segment_filename = file_name + '_1080p_%03d.ts'
 
-    source_linux = "/mnt/" + source.replace("\\", "/").replace("C:", "c")
-    target_linux = "/mnt/" + target.replace("\\", "/").replace("C:", "c")
-    segment_filename_linux = "/mnt/" + segment_filename.replace("\\", "/").replace("C:", "c")
-
-    cmd = 'ffmpeg -i "{}" -vf scale=-2:1080 -c:v h264 -b:v 5000k -c:a aac -b:a 128k -hls_time 6 -hls_playlist_type vod -hls_segment_filename "{}" "{}"'.format(source_linux,segment_filename_linux, target_linux)
+    cmd = 'ffmpeg -i "{}" -vf scale=-2:1080 -c:v h264 -b:v 5000k -c:a aac -b:a 128k -hls_time 6 -hls_playlist_type vod -hls_segment_filename "{}" "{}"'.format(source, segment_filename, target)
     subprocess.run(cmd, capture_output=True, shell=True)
 
 def convert_HLS_to_720p(source):
@@ -157,11 +135,7 @@ def convert_HLS_to_720p(source):
     target = file_name + '_720p.m3u8'
     segment_filename = file_name + '_720p_%03d.ts'
 
-    source_linux = "/mnt/" + source.replace("\\", "/").replace("C:", "c")
-    target_linux = "/mnt/" + target.replace("\\", "/").replace("C:", "c")
-    segment_filename_linux = "/mnt/" + segment_filename.replace("\\", "/").replace("C:", "c")
-
-    cmd = 'ffmpeg -i "{}" -vf scale=-2:720 -c:v h264 -b:v 3000k -c:a aac -b:a 128k -hls_time 6 -hls_playlist_type vod -hls_segment_filename "{}" "{}"'.format(source_linux,segment_filename_linux, target_linux)
+    cmd = 'ffmpeg -i "{}" -vf scale=-2:720 -c:v h264 -b:v 3000k -c:a aac -b:a 128k -hls_time 6 -hls_playlist_type vod -hls_segment_filename "{}" "{}"'.format(source, segment_filename, target)
     subprocess.run(cmd, capture_output=True, shell=True)
 
 def convert_HLS_to_480p(source):
@@ -172,11 +146,7 @@ def convert_HLS_to_480p(source):
     target = file_name + '_480p.m3u8'
     segment_filename = file_name + '_480p_%03d.ts'
 
-    source_linux = "/mnt/" + source.replace("\\", "/").replace("C:", "c")
-    target_linux = "/mnt/" + target.replace("\\", "/").replace("C:", "c")
-    segment_filename_linux = "/mnt/" + segment_filename.replace("\\", "/").replace("C:", "c")
-
-    cmd = 'ffmpeg -i "{}" -vf scale=-2:480 -c:v h264 -b:v 1000k -c:a aac -b:a 128k -hls_time 6 -hls_playlist_type vod -hls_segment_filename "{}" "{}"'.format(source_linux,segment_filename_linux, target_linux)
+    cmd = 'ffmpeg -i "{}" -vf scale=-2:480 -c:v h264 -b:v 1000k -c:a aac -b:a 128k -hls_time 6 -hls_playlist_type vod -hls_segment_filename "{}" "{}"'.format(source, target, segment_filename)
     subprocess.run(cmd, capture_output=True, shell=True)
 
 def delete_video_files(video_id):

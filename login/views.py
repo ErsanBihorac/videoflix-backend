@@ -15,6 +15,7 @@ from django.utils.encoding import smart_str, smart_bytes, DjangoUnicodeDecodeErr
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
+from django.shortcuts import redirect
 from .utils import Util
 from dotenv import load_dotenv
 load_dotenv()
@@ -63,7 +64,10 @@ class VerifyEmailView(generics.GenericAPIView):
             if not user.is_verified:
                 user.is_verified = True
                 user.save()
-            return Response({'email': 'Succesfully activated'}, status=status.HTTP_200_OK)
+            # current_site=os.getenv('FRONTEND_DOMAIN_HOST')
+            # redirect_url='https://'+current_site+'/login'
+            redirect_url_development='http://localhost:4200/login'
+            return redirect(redirect_url_development)
         except jwt.ExpiredSignatureError as identifier:
             return Response({'error': 'Activation Expired'}, status=status.HTTP_400_BAD_REQUEST)
         except jwt.exceptions.DecodeError as identifier:
